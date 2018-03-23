@@ -35,10 +35,11 @@ typedef enum {
 
 - (void)initUI
 {
+    CGFloat kScreenWidth = [UIScreen mainScreen].bounds.size.width;
     _encryptBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_encryptBtn setTitle:@"Encrypt" forState:UIControlStateNormal];
     [_encryptBtn setTitle:@"Encrypt" forState:UIControlStateSelected];
-    _encryptBtn.frame = CGRectMake(100, 100, 100, 50);
+    _encryptBtn.frame = CGRectMake( kScreenWidth/2-50, 150, 100, 50);
     [self.view addSubview:_encryptBtn];
     _encryptBtn.titleLabel.font = [UIFont systemFontOfSize:15 weight:15];
     _encryptBtn.titleLabel.textColor = [UIColor greenColor];
@@ -49,7 +50,7 @@ typedef enum {
     [_decryptBtn setTitle:@"Decrypt" forState:UIControlStateNormal];
     [_decryptBtn setTitle:@"Decrypt" forState:UIControlStateSelected];
     _decryptBtn.titleLabel.font = [UIFont systemFontOfSize:15 weight:15];
-    _decryptBtn.frame = CGRectMake(100, 200, 100, 50);
+    _decryptBtn.frame = CGRectMake(kScreenWidth/2-50, 250, 100, 50);
     [self.view addSubview:_decryptBtn];
     _decryptBtn.titleLabel.textColor = [UIColor yellowColor];
     _decryptBtn.backgroundColor = [UIColor grayColor];
@@ -119,7 +120,7 @@ typedef enum {
                       @"bgcolor": @"",
                       @"navigation_items": @[
                               @{
-                                  @"icon": @"https://fdc.m.huisou.com/Public/Apps/images/index_nav_location_white.png",
+                                  @"icon": @"https://fdc.m.com/Public/Apps/images/index_nav_location_white.png",
                                   @"text": @"全国",
                                   @"bg_color": @"",
                                   @"text_color": @"#FFFFFF",
@@ -130,18 +131,18 @@ typedef enum {
                                   },
                               @{
                                   @"type": @"search_big",
-                                  @"icon": @"https://fdc.m.huisou.com/Public/Apps/images/index_nav_search_small_black.png",
+                                  @"icon": @"https://fdc.m.com/Public/Apps/images/index_nav_search_small_black.png",
                                   @"text": @"请输入关键词搜索",
                                   @"bg_color": @"#F5F5F5",
                                   @"text_color": @"#999999",
-                                  @"sub_icon": @"https://fdc.m.huisou.com/Public/Apps/images/index_nav_code_black.png",
+                                  @"sub_icon": @"https://fdc.m.com/Public/Apps/images/index_nav_code_black.png",
                                   @"magic": @"qr_code",
                                   @"href_model": @"search",
                                   @"is_show": @"1"
                                   },
                               @{
                                   @"type": @"message",
-                                  @"icon": @"https://fdc.m.huisou.com/Public/Apps/images/index_nav_message_white.png",
+                                  @"icon": @"https://fdc.m.com/Public/Apps/images/index_nav_message_white.png",
                                   @"text": @"",
                                   @"bg_color": @"",
                                   @"text_color": @"",
@@ -163,7 +164,7 @@ typedef enum {
                                   },
                               @{
                                   @"type": @"search",
-                                  @"icon": @"https://fdc.m.huisou.com/Public/Apps/images/index_nav_search_big_white.png",
+                                  @"icon": @"https://fdc.m.com/Public/Apps/images/index_nav_search_big_white.png",
                                   @"text": @"",
                                   @"bg_color": @"",
                                   @"text_color": @"",
@@ -174,7 +175,7 @@ typedef enum {
                                   },
                               @{
                                   @"type": @"cart",
-                                  @"icon": @"https://fdc.m.huisou.com/Public/Apps/images/index_nav_cart_white.png",
+                                  @"icon": @"https://fdc.m.com/Public/Apps/images/index_nav_cart_white.png",
                                   @"text": @"",
                                   @"bg_color": @"",
                                   @"text_color": @"#FFFFFF",
@@ -202,7 +203,7 @@ typedef enum {
                                       @"data_id": @"",
                                       @"title": @"111",
                                       @"sub_title": @"",
-                                      @"img": @"https://fdc.m.huisou.com/Uploads/Admin/image/20170814/20170814173053_39127.jpg",
+                                      @"img": @"https://fdc.m.com/Uploads/Admin/image/20170814/20170814173053_39127.jpg",
                                       @"line_height": @"300",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -216,7 +217,7 @@ typedef enum {
                                       @"data_id": @"",
                                       @"title": @"111",
                                       @"sub_title": @"",
-                                      @"img": @"https://fdc.m.huisou.com/Uploads/Admin/image/20170814/20170814173110_70122.jpg",
+                                      @"img": @"https://fdc.m.com/Uploads/Admin/image/20170814/20170814173110_70122.jpg",
                                       @"line_height": @"300",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -230,7 +231,7 @@ typedef enum {
                                       @"data_id": @"",
                                       @"title": @"111",
                                       @"sub_title": @"",
-                                      @"img": @"https://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531155617_63964.png",
+                                      @"img": @"https://fdc.m.com/Uploads/Admin/image/20170531/20170531155617_63964.png",
                                       @"line_height": @"300",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -258,7 +259,7 @@ typedef enum {
                                       @"data_id": @"1",
                                       @"title": @"新房",
                                       @"sub_title": @"",
-                                      @"img": @"https://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531155446_89212.png",
+                                      @"img": @"https://fdc.m.com/Uploads/Admin/image/20170531/20170531155446_89212.png",
                                       @"line_height": @"50",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -272,7 +273,7 @@ typedef enum {
                                       @"data_id": @"2",
                                       @"title": @"二手房",
                                       @"sub_title": @"",
-                                      @"img": @"https://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531160413_68078.png",
+                                      @"img": @"https://fdc.m.com/Uploads/Admin/image/20170531/20170531160413_68078.png",
                                       @"line_height": @"50",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -286,7 +287,7 @@ typedef enum {
                                       @"data_id": @"3",
                                       @"title": @"招租房",
                                       @"sub_title": @"",
-                                      @"img": @"https://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531160434_15095.png",
+                                      @"img": @"https://fdc.m.com/Uploads/Admin/image/20170531/20170531160434_15095.png",
                                       @"line_height": @"50",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -300,7 +301,7 @@ typedef enum {
                                       @"data_id": @"4",
                                       @"title": @"商铺写字楼",
                                       @"sub_title": @"",
-                                      @"img": @"https://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531161204_49593.png",
+                                      @"img": @"https://fdc.m.com/Uploads/Admin/image/20170531/20170531161204_49593.png",
                                       @"line_height": @"50",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -314,7 +315,7 @@ typedef enum {
                                       @"data_id": @"5",
                                       @"title": @"餐饮地产",
                                       @"sub_title": @"",
-                                      @"img": @"https://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531161815_81356.png",
+                                      @"img": @"https://fdc.m.com/Uploads/Admin/image/20170531/20170531161815_81356.png",
                                       @"line_height": @"50",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -328,7 +329,7 @@ typedef enum {
                                       @"data_id": @"6",
                                       @"title": @"工业地产",
                                       @"sub_title": @"",
-                                      @"img": @"https://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531162148_88794.png",
+                                      @"img": @"https://fdc.m.com/Uploads/Admin/image/20170531/20170531162148_88794.png",
                                       @"line_height": @"50",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -342,7 +343,7 @@ typedef enum {
                                       @"data_id": @"7",
                                       @"title": @"帮你找房",
                                       @"sub_title": @"",
-                                      @"img": @"https://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531162222_99348.png",
+                                      @"img": @"https://fdc.m.com/Uploads/Admin/image/20170531/20170531162222_99348.png",
                                       @"line_height": @"50",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -356,7 +357,7 @@ typedef enum {
                                       @"data_id": @"8",
                                       @"title": @"招商加盟",
                                       @"sub_title": @"",
-                                      @"img": @"https://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531162253_82568.png",
+                                      @"img": @"https://fdc.m.com/Uploads/Admin/image/20170531/20170531162253_82568.png",
                                       @"line_height": @"50",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -374,7 +375,7 @@ typedef enum {
                           @"section_top": @"0",
                           @"section_bottom": @"10",
                           @"section_title_show": @"0",
-                          @"section_title_icon": @"https://fdc.m.huisou.com/Public/Apps/images/index_news_top.png",
+                          @"section_title_icon": @"https://fdc.m.com/Public/Apps/images/index_news_top.png",
                           @"section_title_text": @"",
                           @"section_title_sub": @"",
                           @"section_title_arrow": @"1",
@@ -468,7 +469,7 @@ typedef enum {
                                       @"data_id": @"23",
                                       @"title": @"最新土地规划调整解读：政策意图何在、对房价何影响",
                                       @"sub_title": @"最新土地规划调整解读：政策意图何在、对房价何影响",
-                                      @"img": @"http://fdc.m.huisou.com/Uploads/Admin/image/20170816/20170816171612_81372.jpg",
+                                      @"img": @"http://fdc.m.com/Uploads/Admin/image/20170816/20170816171612_81372.jpg",
                                       @"line_height": @"100",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -482,7 +483,7 @@ typedef enum {
                                       @"data_id": @"22",
                                       @"title": @"传承财富管理基因 打造海外规划旗舰",
                                       @"sub_title": @"传承财富管理基因 打造海外规划旗舰",
-                                      @"img": @"http://fdc.m.huisou.com/Uploads/Admin/image/20170816/20170816171409_93360.jpg",
+                                      @"img": @"http://fdc.m.com/Uploads/Admin/image/20170816/20170816171409_93360.jpg",
                                       @"line_height": @"100",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -496,7 +497,7 @@ typedef enum {
                                       @"data_id": @"21",
                                       @"title": @"专家：调控政策几乎到极致 房地产税将逐步落地",
                                       @"sub_title": @"专家：调控政策几乎到极致 房地产税将逐步落地",
-                                      @"img": @"http://fdc.m.huisou.com/Uploads/Admin/image/20170816/20170816171129_68835.jpg",
+                                      @"img": @"http://fdc.m.com/Uploads/Admin/image/20170816/20170816171129_68835.jpg",
                                       @"line_height": @"100",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -524,7 +525,7 @@ typedef enum {
                                       @"data_id": @"20",
                                       @"title": @"昆山六九网络科技有限公司",
                                       @"sub_title": @"",
-                                      @"img": @"https://fdc.m.huisou.com/Uploads/Admin/image/20170731/20170731153449_20882.png",
+                                      @"img": @"https://fdc.m.com/Uploads/Admin/image/20170731/20170731153449_20882.png",
                                       @"line_height": @"150",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -538,7 +539,7 @@ typedef enum {
                                       @"data_id": @"3",
                                       @"title": @"深圳市世祥房地产中介服务部",
                                       @"sub_title": @"",
-                                      @"img": @"https://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531154850_72806.png",
+                                      @"img": @"https://fdc.m.com/Uploads/Admin/image/20170531/20170531154850_72806.png",
                                       @"line_height": @"150",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -552,7 +553,7 @@ typedef enum {
                                       @"data_id": @"4",
                                       @"title": @"江苏恒迪集团有限公司",
                                       @"sub_title": @"",
-                                      @"img": @"https://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531154921_95913.png",
+                                      @"img": @"https://fdc.m.com/Uploads/Admin/image/20170531/20170531154921_95913.png",
                                       @"line_height": @"150",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -566,7 +567,7 @@ typedef enum {
                                       @"data_id": @"5",
                                       @"title": @"东莞市光怡房地产代理有限公司",
                                       @"sub_title": @"",
-                                      @"img": @"https://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531154955_13264.png",
+                                      @"img": @"https://fdc.m.com/Uploads/Admin/image/20170531/20170531154955_13264.png",
                                       @"line_height": @"150",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -580,7 +581,7 @@ typedef enum {
                                       @"data_id": @"2",
                                       @"title": @"21世纪不动产信德益家房地产",
                                       @"sub_title": @"",
-                                      @"img": @"https://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531154753_48840.png",
+                                      @"img": @"https://fdc.m.com/Uploads/Admin/image/20170531/20170531154753_48840.png",
                                       @"line_height": @"150",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -608,7 +609,7 @@ typedef enum {
                                       @"data_id": @"4",
                                       @"title": @"天阳尚城国际",
                                       @"sub_title": @"天阳尚城国际",
-                                      @"img": @"http://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531174552_97116.png",
+                                      @"img": @"http://fdc.m.com/Uploads/Admin/image/20170531/20170531174552_97116.png",
                                       @"line_height": @"100",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -622,7 +623,7 @@ typedef enum {
                                       @"data_id": @"3",
                                       @"title": @"金龙大厦",
                                       @"sub_title": @"金龙大厦",
-                                      @"img": @"http://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531174431_27249.png",
+                                      @"img": @"http://fdc.m.com/Uploads/Admin/image/20170531/20170531174431_27249.png",
                                       @"line_height": @"100",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -636,7 +637,7 @@ typedef enum {
                                       @"data_id": @"2",
                                       @"title": @"风云社区",
                                       @"sub_title": @"风云社区",
-                                      @"img": @"http://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531174341_17990.png",
+                                      @"img": @"http://fdc.m.com/Uploads/Admin/image/20170531/20170531174341_17990.png",
                                       @"line_height": @"100",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -650,7 +651,7 @@ typedef enum {
                                       @"data_id": @"1",
                                       @"title": @"贝越流明新苑",
                                       @"sub_title": @"贝越流明新苑",
-                                      @"img": @"http://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531173939_23862.png",
+                                      @"img": @"http://fdc.m.com/Uploads/Admin/image/20170531/20170531173939_23862.png",
                                       @"line_height": @"100",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -678,7 +679,7 @@ typedef enum {
                                       @"data_id": @"62",
                                       @"title": @"近市北工业园区 ",
                                       @"sub_title": @"近市北工业园区 ",
-                                      @"img": @"http://fdc.m.huisou.com/Uploads/Admin/image/20170822/20170822154338_23855.png",
+                                      @"img": @"http://fdc.m.com/Uploads/Admin/image/20170822/20170822154338_23855.png",
                                       @"line_height": @"100",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -692,7 +693,7 @@ typedef enum {
                                       @"data_id": @"61",
                                       @"title": @"泰和名都商铺可做重餐饮 装潢设计",
                                       @"sub_title": @"泰和名都商铺可做重餐饮 装潢设计",
-                                      @"img": @"http://fdc.m.huisou.com/Uploads/Admin/image/20170822/20170822153351_47967.png",
+                                      @"img": @"http://fdc.m.com/Uploads/Admin/image/20170822/20170822153351_47967.png",
                                       @"line_height": @"100",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -706,7 +707,7 @@ typedef enum {
                                       @"data_id": @"60",
                                       @"title": @"一楼商铺出租，可重餐饮已经装修",
                                       @"sub_title": @"一楼商铺出租，可重餐饮已经装修",
-                                      @"img": @"http://fdc.m.huisou.com/Uploads/Admin/image/20170822/20170822152937_24013.png",
+                                      @"img": @"http://fdc.m.com/Uploads/Admin/image/20170822/20170822152937_24013.png",
                                       @"line_height": @"100",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -720,7 +721,7 @@ typedef enum {
                                       @"data_id": @"59",
                                       @"title": @"万科七宝国际 二期办公楼/商",
                                       @"sub_title": @"万科七宝国际 二期办公楼/商铺",
-                                      @"img": @"http://fdc.m.huisou.com/Uploads/Admin/image/20170822/20170822151857_92400.png",
+                                      @"img": @"http://fdc.m.com/Uploads/Admin/image/20170822/20170822151857_92400.png",
                                       @"line_height": @"100",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -734,7 +735,7 @@ typedef enum {
                                       @"data_id": @"10",
                                       @"title": @"天阳尚城国际二期",
                                       @"sub_title": @"天阳尚城国际二期",
-                                      @"img": @"http://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531165106_99400.png",
+                                      @"img": @"http://fdc.m.com/Uploads/Admin/image/20170531/20170531165106_99400.png",
                                       @"line_height": @"100",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -748,7 +749,7 @@ typedef enum {
                                       @"data_id": @"9",
                                       @"title": @"天阳尚城国际二期",
                                       @"sub_title": @"天阳尚城国际二期",
-                                      @"img": @"http://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531165020_24935.png",
+                                      @"img": @"http://fdc.m.com/Uploads/Admin/image/20170531/20170531165020_24935.png",
                                       @"line_height": @"100",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -762,7 +763,7 @@ typedef enum {
                                       @"data_id": @"8",
                                       @"title": @"(单间出租)家乐公寓新房装修，环境优雅，高品质的人租高品质房，不要错过。",
                                       @"sub_title": @"(单间出租)家乐公寓新房装修，环境优雅，高品质的人租高品质房，不要错过。",
-                                      @"img": @"http://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531164924_24618.png",
+                                      @"img": @"http://fdc.m.com/Uploads/Admin/image/20170531/20170531164924_24618.png",
                                       @"line_height": @"100",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -776,7 +777,7 @@ typedef enum {
                                       @"data_id": @"7",
                                       @"title": @"促销房源，好房出租，拎包入住",
                                       @"sub_title": @"促销房源，好房出租，拎包入住",
-                                      @"img": @"http://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531164837_87052.png",
+                                      @"img": @"http://fdc.m.com/Uploads/Admin/image/20170531/20170531164837_87052.png",
                                       @"line_height": @"100",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -790,7 +791,7 @@ typedef enum {
                                       @"data_id": @"6",
                                       @"title": @"城市公寓",
                                       @"sub_title": @"城市公寓",
-                                      @"img": @"http://fdc.m.huisou.com/Uploads/Admin/image/20170531/20170531164749_38722.png",
+                                      @"img": @"http://fdc.m.com/Uploads/Admin/image/20170531/20170531164749_38722.png",
                                       @"line_height": @"100",
                                       @"radius": @"0",
                                       @"href": @"",
@@ -804,7 +805,8 @@ typedef enum {
                           }
                       ]
               };
-    //    _dict = @{@"token":@"ringqweqwweqwe1231312312"};
+    //实验较短字典加密
+//    _dict = @{@"token":@"123123123asdasd"};
     return _dict;
 }
 @end

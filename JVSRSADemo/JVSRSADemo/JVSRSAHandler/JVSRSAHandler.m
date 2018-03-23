@@ -16,9 +16,8 @@ static NSInteger kDecryptionLength = 128;
 static NSString *kPublicKeyFile = @"rsa_public_key";
 //加密长度,前后台要统一
 static NSInteger kEncryptionLength = 117;
-//RSA密钥文件名
+//RSA密钥文件名,目前没有此类调用,后续可能会添加
 static NSString *kPrivateKeyFile = @"rsa_private_key";
-
 
 @implementation JVSRSAHandler
 
@@ -62,9 +61,13 @@ static NSString *kPrivateKeyFile = @"rsa_private_key";
 //加密字典
 - (NSString *)encryptDictionary:(NSDictionary*)dict WithRSAKeyType:(KeyType)keyType
 {
+    //将字典转成json字符串
     NSString *jsonString = [self conversionDictionary:dict];
-    NSData *utf8data = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
-    NSData *RSAEncryptData = [self encryptionData:utf8data WithRSAKeyType:keyType];
+    //转成UTF8Data
+    NSData *UTF8Data = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
+    //加密过程
+    NSData *RSAEncryptData = [self encryptionData:UTF8Data WithRSAKeyType:keyType];
+    //转成base64的string
     NSString *encryptString = [RSAEncryptData base64EncodedString];
     return encryptString;
 }
@@ -72,63 +75,87 @@ static NSString *kPrivateKeyFile = @"rsa_private_key";
 //解密字符串
 - (NSDictionary *)decryptString:(NSString *)encryptedString WithRSAKeyType:(KeyType)keyType
 {
+    //将要解密的字符串base64解码
     NSData *encryptedData = [[NSData alloc] initWithBase64EncodedString:encryptedString options:NSDataBase64DecodingIgnoreUnknownCharacters];
+    //解密过程
     NSData *jsonData = [self decryptData:encryptedData WithRSAKeyType:keyType];
+    //将data转成string
     NSString *josnString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    //转成字典输出
     NSDictionary *dict = [self dictionaryWithJsonString:josnString];
     return dict;
 }
 
 
-//解密方法
-- (NSData *)decryptData:(NSData *)encryptedData WithRSAKeyType:(KeyType)keyType
+//加密方法,这里主要是分段内容
+- (NSData *)encryptionData:(NSData *)expressData WithRSAKeyType:(KeyType)keyType
 {
-    if (encryptedData && [encryptedData length]) {
-        NSInteger blockLength = kDecryptionLength;//解密必须是这个长度
-        NSInteger sumLen = [encryptedData length];
-        NSInteger blockCount = sumLen/blockLength;
+    if (expressData && [expressData length]) {
+        //计划分段加密长度
+        NSInteger planSubLength = kEncryptionLength;
+        //数据总长度
+        NSInteger sumLength = [expressData length];
+        //分段数
+        NSInteger blockCount = sumLength/planSubLength + ((sumLength%planSubLength)?1:0);
+        //总的数据,存放解密后的数据
         NSMutableData *sumData = [[NSMutableData alloc ] initWithCapacity:0];
-        for(NSInteger i = 0;i < blockCount; i++)
+        for(int i = 0;i < blockCount; i++)
         {
-            int flen = (int)MIN(blockLength, sumLen - i * blockLength);
-            unsigned char from[flen];
-            bzero(from, sizeof(from));
-            memcpy(from, [[encryptedData subdataWithRange:NSMakeRange(i*blockLength, flen)] bytes], flen);
-            unsigned char to[blockLength];
-            bzero(to, sizeof(to));
-            [self decryptFrom:from flen:flen to:to WithKeyType:keyType];
+            //实际分段长度,注意最后一段不够的问题
+            int relSubLength = (int)MIN(planSubLength, sumLength - i*planSubLength);
+            //定义放置待加密数据的数组,容量为实际分段长度(明文,较短)
+            unsigned char expressArr[relSubLength];
+            //C函数方法,将数组初始化置空
+            bzero(expressArr, sizeof(expressArr));
+            //在expressArr中放入目标要加密的数据
+            memcpy(expressArr, [[expressData subdataWithRange:NSMakeRange(i*planSubLength, relSubLength)] bytes], relSubLength);
+            //定义存放加密后数据的数组,因为明文长度不得大于密文长度,所以这里的长度为计划长度(密文,较长)
+            unsigned char encryptedArr[planSubLength];
+            //同上,将数组初始化置空
+            bzero(encryptedArr, sizeof(encryptedArr));
+            //加密expressArr中的数据并放入encryptedArr数组中
+            [self encryptFrom:expressArr length:(int)relSubLength to:encryptedArr WithKeyType:keyType];
+            //取出encryptedArr数组的有效内容长度，不能用数组长度，因为encryptedArr为unsigned char*型，可能有效内容之间也有“\0”,需要去除
             int k=0;
-            //取出to数组的有效内容长度，不能用strlen，因为to为unsigned char*型，可能有效内容之间也有“\0”
-            for(int j = 0;j< blockLength;j++)
+            //不明白这里为什么是128,按理说128会越界的,因为定义的时候数组长度只有117
+            for(int j = 0;j< 128;j++)
             {
-                if (to[j] == '\0') {
-                    
-                }
-                if(to[j] != '\0')
+                if(encryptedArr[j] != '\0')
                 {
                     k = j+1;
                 }
             }
-            [sumData appendData:[NSData dataWithBytes:to length:k]];
+            //同样不明白这里的操作含义,去掉的话加密成功率降低很多
+            if(k%4 != 0){
+                
+                k = ((int)(k/4) + 1)*4;
+                
+            }
+            //拼接加密后数据
+            [sumData appendData:[NSData dataWithBytes:encryptedArr length:k]];
         }
         return sumData;
     }
     return nil;
 }
-//解密算法
-- (NSInteger)decryptFrom:(const unsigned char *)from flen:(int)flen to:(unsigned char *)to WithKeyType:(KeyType)keyType
+//加密部分
+- (NSInteger)encryptFrom:(const unsigned char *)expressArr length:(int)length to:(unsigned char *)encryptedArr WithKeyType:(KeyType)keyType
 {
+    //导入文件中密钥
     if (![self importRSAKeyWithType:keyType])
-        return -1;
-    if (from != NULL && to != NULL) {
-        int status;
+        return 0;
+    if (expressArr != NULL && encryptedArr != NULL) {
+        NSInteger status;
         switch (keyType) {
             case KeyTypePrivate:{
-                status =  (int)RSA_private_decrypt(flen, from,to, _rsa, kRSAPaddingType);
+                //私钥加密
+                status =  RSA_private_encrypt(length, expressArr,encryptedArr, _rsa, kRSAPaddingType);
             }
                 break;
+                
             default:{
-                status =  RSA_public_decrypt(flen,from,to, _rsa,  kRSAPaddingType);
+                //公钥加密
+                status =  RSA_public_encrypt(length,expressArr,encryptedArr, _rsa,  kRSAPaddingType);
             }
                 break;
         }
@@ -136,54 +163,69 @@ static NSString *kPrivateKeyFile = @"rsa_private_key";
     }
     return -1;
 }
-//加密方法
-- (NSData *)encryptionData:(NSData *)expressData WithRSAKeyType:(KeyType)keyType
+
+
+//解密方法(主要是分段)
+- (NSData *)decryptData:(NSData *)encryptedData WithRSAKeyType:(KeyType)keyType
 {
-    if (expressData && [expressData length]) {
-        NSInteger blockLength = kEncryptionLength;//加密必须是这个长度
-        NSInteger sumLen = [expressData length];
-        NSInteger blockCount = sumLen/blockLength + 1;
+    if (encryptedData && [encryptedData length]) {
+        //计划解密长度
+        NSInteger planSubLength = kDecryptionLength;
+        //数据总长度
+        NSInteger sumLength = [encryptedData length];
+        //分段数
+        NSInteger blockCount = sumLength/planSubLength + ((sumLength%planSubLength)?1:0);
+        //存放解密后的数据
         NSMutableData *sumData = [[NSMutableData alloc ] initWithCapacity:0];
         for(int i = 0;i < blockCount; i++)
         {
-            int flen = (int)MIN(blockLength, sumLen - i * blockLength);
-            unsigned char from[flen];
-            bzero(from, sizeof(from));
-            memcpy(from, [[expressData subdataWithRange:NSMakeRange(i*blockLength, flen)] bytes], flen);
-            unsigned char to[kEncryptionLength];
-            bzero(to, sizeof(to));
-            [self encryptFrom:from flen:flen to:to WithKeyType:keyType];
-            //取出to数组的有效内容长度，不能用strlen，因为to为unsigned char*型，可能有效内容之间也有“\0”
+            //实际分段的长度,注意最后一段不够的情况
+            int realSubLength = (int)MIN(planSubLength, sumLength - i*planSubLength);
+            //定义存放待解密数据的数组encryptedArr(密文,较长)
+            unsigned char encryptedArr[planSubLength];
+            //C函数,初始化置空encryptedArr数组
+            bzero(encryptedArr, sizeof(encryptedArr));
+            //将待解密的data数据存放入encryptedArr数组中
+            memcpy(encryptedArr, [[encryptedData subdataWithRange:NSMakeRange(i*planSubLength, realSubLength)] bytes], realSubLength);
+            //定义存放解密出来的数据的数组expressArr(明文,较短)
+            unsigned char expressArr[realSubLength];
+            //初始化置空expressArr数组
+            bzero(expressArr, sizeof(expressArr));
+            //解密encryptedArr中的数据并存入expressArr中
+            [self decryptFrom:encryptedArr length:realSubLength to:expressArr WithKeyType:keyType];
             int k=0;
-            for(int j = 0;j< 128;j++)
+            //取出expressArr数组的有效内容长度，不能用数组长度，因为expressArr为unsigned char*型，可能有效内容之间也有“\0”,需要去除
+            for(int j = 0;j< planSubLength;j++)
             {
-                if(to[j] != '\0')
+                if(expressArr[j] != '\0')
                 {
                     k = j+1;
                 }
             }
-            [sumData appendData:[NSData dataWithBytes:to length:k]];
+            //拼接解密出来的数据
+            [sumData appendData:[NSData dataWithBytes:expressArr length:k]];
         }
         return sumData;
     }
     return nil;
 }
-//加密算法
-- (NSInteger)encryptFrom:(const unsigned char *)from flen:(int)flen to:(unsigned char *)to WithKeyType:(KeyType)keyType
+//实际解密部分
+- (NSInteger)decryptFrom:(const unsigned char *)encryptedArr length:(int)length to:(unsigned char *)expressArr WithKeyType:(KeyType)keyType
 {
+    //获取密钥
     if (![self importRSAKeyWithType:keyType])
-        return 0;
-    if (from != NULL && to != NULL) {
+        return -1;
+    if (encryptedArr != NULL && expressArr != NULL) {
         int status;
-        
         switch (keyType) {
             case KeyTypePrivate:{
-                status =  RSA_private_encrypt(flen, from,to, _rsa, kRSAPaddingType);
+                //私钥解密
+                status =  (int)RSA_private_decrypt(length, encryptedArr,expressArr, _rsa, kRSAPaddingType);
             }
                 break;
-                
             default:{
-                status =  RSA_public_encrypt(flen,from,to, _rsa,  kRSAPaddingType);
+                //公钥解密
+                status =  RSA_public_decrypt(length, encryptedArr, expressArr, _rsa,  kRSAPaddingType);
             }
                 break;
         }
