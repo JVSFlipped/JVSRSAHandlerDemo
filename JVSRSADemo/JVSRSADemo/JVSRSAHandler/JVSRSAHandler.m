@@ -209,7 +209,7 @@ static NSString *kPrivateKeyFile = @"rsa_private_key";
     }
     return nil;
 }
-//实际解密部分
+//解密方法
 - (NSInteger)decryptFrom:(const unsigned char *)encryptedArr length:(int)length to:(unsigned char *)expressArr WithKeyType:(KeyType)keyType
 {
     //获取密钥
