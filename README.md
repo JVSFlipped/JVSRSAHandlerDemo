@@ -1,4 +1,4 @@
-## iOS中使用基于RSA使用公钥加密和公钥解密
+### 前言
 最近在公司项目中被要求使用RSA加密,且要求是全程加解密,期间也是踩了很多的坑,在此做个记录也算给要使用的朋友一点帮助.注意,具体的RSA加密算法内容并不在此文的讨论范围之内.本文更多聚焦于使用部分.
 
 ### 我当前的使用场景和环境:
@@ -22,7 +22,7 @@
 
 这个方法中的文件名保持一致.
 
-#### 接下里我详细谈谈我在做这个需求时候踩到的坑和一些注意点: 
+### 接下里我详细谈谈我在做这个需求时候踩到的坑和一些注意点: 
 1.网上有很多公钥加密私钥解密的,我找了很久都没找到合适的公钥解密的解决方案,各位不要去找后台要私钥啊,这牵扯到RSA的加密机制,即使用的策略是非对称加密,即客户端使用公钥,后台使用私钥,公钥加密的内容只有私钥能解开,这样即使客户端的公钥被窃取了(实际上设计是公开公钥的),只要私钥妥善得保管在后台,公钥加密数据的安全就能得到保证.  
 2.要确定几个重要参数,我在demo中有注释  
 
@@ -119,8 +119,8 @@ JVSRSAHandler提供了加密方法将字典转换并基于RSA加密后再base64�
         {
             //实际分段长度,注意最后一段不够的问题
             int relSubLength = (int)MIN(planSubLength, sumLength - i*planSubLength);
-            //定义放置待加密数据的数组,容量为实际分段长度(明文,较短)
-            unsigned char expressArr[relSubLength];
+            //定义放置待加密数据的数组, 因为要按kDecryptionLength(128)进行拼接, 所以长度为 128
+            unsigned char expressArr[kDecryptionLength];
             //C函数方法,将数组初始化置空
             bzero(expressArr, sizeof(expressArr));
             //在expressArr中放入目标要加密的数据
@@ -131,9 +131,8 @@ JVSRSAHandler提供了加密方法将字典转换并基于RSA加密后再base64�
             bzero(encryptedArr, sizeof(encryptedArr));
             //加密expressArr中的数据并放入encryptedArr数组中
             [self encryptFrom:expressArr length:(int)relSubLength to:encryptedArr WithKeyType:keyType];
-            //取出encryptedArr数组的有效内容长度，不能用数组长度，因为encryptedArr为unsigned char*型，可能有效内容之间也有“\0”,需要去除
             int k=0;
-            //不明白这里为什么是128,按理说128会越界的,因为定义的时候数组长度只有117
+            // 拼接
             for(int j = 0;j< 128;j++)
             {
                 if(encryptedArr[j] != '\0')
@@ -141,7 +140,7 @@ JVSRSAHandler提供了加密方法将字典转换并基于RSA加密后再base64�
                     k = j+1;
                 }
             }
-            //同样不明白这里的操作含义,去掉的话加密成功率降低很多
+            // base64 解码时候, 长度必须为 4 的倍数
             if(k%4 != 0){
                 
                 k = ((int)(k/4) + 1)*4;
@@ -170,13 +169,13 @@ JVSRSAHandler提供了加密方法将字典转换并基于RSA加密后再base64�
         switch (keyType) {
             case KeyTypePrivate:{
                 //私钥加密
-                status =  RSA_private_encrypt(length, expressArr,encryptedArr, _rsa, kRSAPaddingType);
+                status =  RSA_private_encrypt(length, expressArr,encryptedArr, _rsa, (int)kRSAPaddingType);
             }
                 break;
                 
             default:{
                 //公钥加密
-                status =  RSA_public_encrypt(length,expressArr,encryptedArr, _rsa,  kRSAPaddingType);
+                status =  RSA_public_encrypt(length,expressArr,encryptedArr, _rsa,  (int)kRSAPaddingType);
             }
                 break;
         }
@@ -188,7 +187,7 @@ JVSRSAHandler提供了加密方法将字典转换并基于RSA加密后再base64�
 ```
 
 ### 解密过程
-JVSHandler提供了解密方法将后台给的base64字符串转化成字典
+JVSRSAHandler提供了解密方法将后台给的base64字符串转化成字典
 
 ```
 //解密字符串
@@ -237,7 +236,7 @@ JVSHandler提供了解密方法将后台给的base64字符串转化成字典
             //解密encryptedArr中的数据并存入expressArr中
             [self decryptFrom:encryptedArr length:realSubLength to:expressArr WithKeyType:keyType];
             int k=0;
-            //取出expressArr数组的有效内容长度，不能用数组长度，因为expressArr为unsigned char*型，可能有效内容之间也有“\0”,需要去除
+            // 拼接
             for(int j = 0;j< planSubLength;j++)
             {
                 if(expressArr[j] != '\0')
@@ -267,12 +266,12 @@ JVSHandler提供了解密方法将后台给的base64字符串转化成字典
         switch (keyType) {
             case KeyTypePrivate:{
                 //私钥解密
-                status =  (int)RSA_private_decrypt(length, encryptedArr,expressArr, _rsa, kRSAPaddingType);
+                status =  (int)RSA_private_decrypt(length, encryptedArr,expressArr, _rsa, (int)kRSAPaddingType);
             }
                 break;
             default:{
                 //公钥解密
-                status =  RSA_public_decrypt(length, encryptedArr, expressArr, _rsa,  kRSAPaddingType);
+                status =  RSA_public_decrypt(length, encryptedArr, expressArr, _rsa,  (int)kRSAPaddingType);
             }
                 break;
         }
@@ -291,7 +290,7 @@ JVSHandler提供了解密方法将后台给的base64字符串转化成字典
  
 解密过程:字符串(base64) -> Data(base64解码) -> Data(分段) -> Data(解密) -> 字符串(UTF-8) -> 字典
 
-### 目前存在的问题  
+### 目前存在的问题(已解决, 请往后看)
 * 1.0版本的时候加密不稳定,后来新版本添加了代码基本解决了这个问题,但是这部分代码我是在网上找来的,具体为啥我目前也很懵(emmmmmmm...)
 
 ```
@@ -311,7 +310,31 @@ JVSHandler提供了解密方法将后台给的base64字符串转化成字典
 
 我的疑惑点在哪我已经写在上面了,希望有大神可以赐教.我目前怀疑是RSA本身需要或是编码规则需要,目前还没时间仔细去研究,后续如果搞明白了我会补充的.具体的RSA加解密算法过程之后有时间也会研究下,有必要也会做出一份这样的记录文档分享出来.
 
+### 解决之前的问题
+我们的 app 已经上线很久了, 使用这个轮子也一直没出过啥问题, 也就一直没动力解决之前心中的疑惑, 最近有时间有重头梳理了下这个 RSA 加解密, 和 Base64 编码, 赫然发现我遗留的两个问题的原因竟然真的跟我预期的一样, 妹的我昨晚猜德国赢的, 为啥德国踢不过韩国棒子.
+1. 第一个问题:
+   不明白这里为什么是128,按理说128会越界的,因为定义的时候数组长度只有117?
 
+```
+for(int j = 0;j< 128;j++)
+    {
+        if(encryptedArr[j] != '\0')
+        {
+            k = j+1;
+        }
+    }
+```
+这真是个先有鸡还是先有蛋的问题, 因为这个数组本身长度就不应该定义为 117, 117 是加密长度没有错, 但是是指对 data 的加密长度, 数组本身是用来存数据的, 而 RSA 是非对称加密, 解密的时候长度是128, 所以拼接的时候是按128来拼接的, 所以数组的长度应该是解密长度128而不是加密长度117, 而坑爹的 C 语言数组越界又不报错, 数据拼接起来之后还能正常解密, 我就没往下细想这个问题. 现在看来还是自己当时考虑不够周全.
+2. 第二个问题: 这个操作是啥意思
 
+```
+if(k%4 != 0){
+            k = ((int)(k/4) + 1)*4;
+            }
+```
+这里牵扯到 base64 编码问题, 解码base64时必须要是4的倍数个, 但编码时，字符数无所谓. 这里操作的目的是保证起来的是4的倍数个.
+
+### 后记
+这个轮子稳定性很高了, 至少我尝试过加密很多较多和较为复杂的数据, 而且公司项目目前已经使用三四个月了, 目前没有发现有加解密失败的情况, 文章和 demo 里的代码我也更新了, 请放心使用.
 
 
