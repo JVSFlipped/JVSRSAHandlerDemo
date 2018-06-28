@@ -806,7 +806,7 @@ typedef enum {
                       ]
               };
     //实验较短字典加密
-//    _dict = @{@"token":@"123123123asdasd"};
+    //    _dict = @{@"token":@"123123123asdasd"};
     return _dict;
 }
 @end

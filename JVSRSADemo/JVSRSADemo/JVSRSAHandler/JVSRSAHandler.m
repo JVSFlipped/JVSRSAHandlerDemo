@@ -103,8 +103,11 @@ static NSString *kPrivateKeyFile = @"rsa_private_key";
         {
             //实际分段长度,注意最后一段不够的问题
             int relSubLength = (int)MIN(planSubLength, sumLength - i*planSubLength);
-            //定义放置待加密数据的数组,容量为实际分段长度(明文,较短)
-            unsigned char expressArr[relSubLength];
+            if (relSubLength != 117) {
+                
+            }
+            //定义放置待加密数据的数组, 因为要按128进行拼接, 所以长度为 128
+            unsigned char expressArr[kDecryptionLength];
             //C函数方法,将数组初始化置空
             bzero(expressArr, sizeof(expressArr));
             //在expressArr中放入目标要加密的数据
@@ -115,21 +118,19 @@ static NSString *kPrivateKeyFile = @"rsa_private_key";
             bzero(encryptedArr, sizeof(encryptedArr));
             //加密expressArr中的数据并放入encryptedArr数组中
             [self encryptFrom:expressArr length:(int)relSubLength to:encryptedArr WithKeyType:keyType];
-            //取出encryptedArr数组的有效内容长度，不能用数组长度，因为encryptedArr为unsigned char*型，可能有效内容之间也有“\0”,需要去除
+            // 将数组中数据拼接起来
             int k=0;
-            //不明白这里为什么是128,按理说128会越界的,因为定义的时候数组长度只有117
-            for(int j = 0;j< 128;j++)
+            // 因为解密的时候是128解密的, 所以这里按128位进行拼接
+            for(int j = 0;j< kDecryptionLength;j++)
             {
                 if(encryptedArr[j] != '\0')
                 {
                     k = j+1;
                 }
             }
-            //同样不明白这里的操作含义,去掉的话加密成功率降低很多
+            // Base64编码长度必定是4的倍数, 所以这里需要做此处理
             if(k%4 != 0){
-                
                 k = ((int)(k/4) + 1)*4;
-                
             }
             //拼接加密后数据
             [sumData appendData:[NSData dataWithBytes:encryptedArr length:k]];
@@ -149,13 +150,13 @@ static NSString *kPrivateKeyFile = @"rsa_private_key";
         switch (keyType) {
             case KeyTypePrivate:{
                 //私钥加密
-                status =  RSA_private_encrypt(length, expressArr,encryptedArr, _rsa, kRSAPaddingType);
+                status =  RSA_private_encrypt(length, expressArr,encryptedArr, _rsa, (int)kRSAPaddingType);
             }
                 break;
                 
             default:{
                 //公钥加密
-                status =  RSA_public_encrypt(length,expressArr,encryptedArr, _rsa,  kRSAPaddingType);
+                status =  RSA_public_encrypt(length,expressArr,encryptedArr, _rsa,  (int)kRSAPaddingType);
             }
                 break;
         }
@@ -194,7 +195,7 @@ static NSString *kPrivateKeyFile = @"rsa_private_key";
             //解密encryptedArr中的数据并存入expressArr中
             [self decryptFrom:encryptedArr length:realSubLength to:expressArr WithKeyType:keyType];
             int k=0;
-            //取出expressArr数组的有效内容长度，不能用数组长度，因为expressArr为unsigned char*型，可能有效内容之间也有“\0”,需要去除
+            // 拼接
             for(int j = 0;j< planSubLength;j++)
             {
                 if(expressArr[j] != '\0')
@@ -220,12 +221,12 @@ static NSString *kPrivateKeyFile = @"rsa_private_key";
         switch (keyType) {
             case KeyTypePrivate:{
                 //私钥解密
-                status =  (int)RSA_private_decrypt(length, encryptedArr,expressArr, _rsa, kRSAPaddingType);
+                status =  (int)RSA_private_decrypt(length, encryptedArr,expressArr, _rsa, (int)kRSAPaddingType);
             }
                 break;
             default:{
                 //公钥解密
-                status =  RSA_public_decrypt(length, encryptedArr, expressArr, _rsa,  kRSAPaddingType);
+                status =  RSA_public_decrypt(length, encryptedArr, expressArr, _rsa,  (int)kRSAPaddingType);
             }
                 break;
         }
@@ -263,3 +264,4 @@ static NSString *kPrivateKeyFile = @"rsa_private_key";
 
 
 @end
+
